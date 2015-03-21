@@ -81,26 +81,15 @@ write.table(merged.all, "tidy_data.txt")
 
 # option 1
 library(plyr)
-tidy_data <- ddply(merged.all,.(code_activity,subject),mean) # does not work on columns! 
-tidy_data <- ddply(merged.all,.(code_activity,subject),numcolwise(mean))
-str(tidy_data)
-length(unique(tidy_data$subject))
-length(unique(tidy_data$code_activity))
-dim(tidy_data)
+### tidy_data <- ddply(merged.all,.(code_activity,subject),mean) # does not work on columns! 
+result <- ddply(merged.all,.(code_activity,subject),numcolwise(mean))
+str(result)
+length(unique(result$subject))
+length(unique(result$code_activity))
+dim(result)
 
 # option 2 - use group by + pipe 
-by_  <- group_by(merged.all,code_activity,subject)
-str(by_)
+result2 <- ddply(merged.all,.(code_activity,subject),function(x) {colMeans(x[,4:dim(x)[2]])})
+str(result2)
 
-result3 <-
-    cran %>%
-    group_by(package) %>%
-    summarize(count = n(),
-              unique = n_distinct(ip_id),
-              countries = n_distinct(country),
-              avg_bytes = mean(size)
-    ) %>%
-    filter(countries > 60) %>%
-    arrange(desc(countries), avg_bytes)
-
-write.table(result, "average_data.txt")
+write.table(result, "averages_data.txt")
